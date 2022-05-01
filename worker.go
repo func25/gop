@@ -24,7 +24,7 @@ func (w Worker[T]) Do(inp T) (T, error) {
 
 		if w.Funcs[i].NextConditionFunc != nil {
 			startTime := time.Now()
-			for w.Funcs[i].NextConditionFunc(w.state) {
+			for !w.Funcs[i].NextConditionFunc(w.state) {
 				waitTime := time.Now()
 				if w.Funcs[i].TimeoutFunc != nil && w.Funcs[i].TimeoutFunc(w.state, waitTime.Sub(startTime)) {
 					break
