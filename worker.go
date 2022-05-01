@@ -14,6 +14,7 @@ type FuncDef[T any] struct {
 }
 
 func (w Worker[T]) Do(inp T) (T, error) {
+	var err error
 	w.state = inp
 	for i := range w.Funcs {
 		w.state, err = w.Funcs[i].F(inp)
@@ -32,5 +33,5 @@ func (w Worker[T]) Do(inp T) (T, error) {
 		}
 	}
 
-	return w.state, w.state.Err()
+	return w.state, err
 }
