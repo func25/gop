@@ -8,13 +8,19 @@ import (
 	"time"
 )
 
-func RequestJSON[T any](method string, url string, body []byte, opts ...RequestOption) (T, int, error) {
-	var res T
+type GoperHttpRes[T any] struct {
+	Data       T
+	StatusCode int
+	Body       []byte
+}
+
+func RequestJSON[T any](method string, url string, body []byte, opts ...RequestOption) (GoperHttpRes[T], error) {
+	var res GoperHttpRes[T]
 
 	// config request
 	req, err := http.NewRequest(method, url, bytes.NewReader(body))
 	if err != nil {
-		return res, 0, err
+		return res, err
 	}
 
 	myReq := httpRequest(*req)
@@ -26,20 +32,22 @@ func RequestJSON[T any](method string, url string, body []byte, opts ...RequestO
 	}
 	resp, err := client.Do(req)
 	if err != nil {
-		return res, 0, err
+		return GoperHttpRes[T]{}, err
 	}
 
-	// check status code
-	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusBadRequest {
-		return res, resp.StatusCode, err
-	}
-
-	// return body
-	respBody, err := ioutil.ReadAll(resp.Body)
+	// get body
+	res.Body, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return res, resp.StatusCode, err
+		return res, err
 	}
 
-	err = json.Unmarshal(respBody, &res)
-	return res, resp.StatusCode, err
+	// get status code
+	res.StatusCode = resp.StatusCode
+	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusBadRequest {
+		return res, nil
+	}
+
+	// get data
+	err = json.Unmarshal(res.Body, &res.Data)
+	return res, err
 }
