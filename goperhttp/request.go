@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"time"
 )
 
 type GoperHttpRes[T any] struct {
@@ -23,14 +22,17 @@ func RequestJSON[T any](method string, url string, body []byte, opts ...RequestO
 		return res, err
 	}
 
-	myReq := httpRequest(*req)
+	myReq := httpRequest{
+		Request: req,
+		timeout: 0,
+	}
 	myReq.applyFrom(opts...)
 
 	// send request
 	client := &http.Client{
-		Timeout: 15 * time.Second,
+		Timeout: myReq.timeout,
 	}
-	resp, err := client.Do(req)
+	resp, err := client.Do(myReq.Request)
 	if err != nil {
 		return GoperHttpRes[T]{}, err
 	}
