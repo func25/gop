@@ -2,27 +2,23 @@ package goper
 
 import "time"
 
-type Worker[T WorkerState] struct {
+type Worker[T any] struct {
 	Funcs []FuncDef[T]
 	state T
 }
 
-type FuncDef[T WorkerState] struct {
-	F                 func(T) T
+type FuncDef[T any] struct {
+	F                 func(T) (T, error)
 	NextConditionFunc func(T) bool
 	TimeoutFunc       func(T, time.Duration) bool
-}
-
-type WorkerState interface {
-	Err() error
 }
 
 func (w Worker[T]) Do(inp T) (T, error) {
 	w.state = inp
 	for i := range w.Funcs {
-		w.state = w.Funcs[i].F(inp)
-		if w.state.Err() != nil {
-			break
+		w.state, err = w.Funcs[i].F(inp)
+		if err != nil {
+			return w.state, err
 		}
 
 		if w.Funcs[i].NextConditionFunc != nil {
