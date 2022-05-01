@@ -21,6 +21,9 @@ func (w Worker[T]) Do(inp T) (T, error) {
 	w.state = inp
 	for i := range w.Funcs {
 		w.state = w.Funcs[i].F(inp)
+		if w.state.Err() != nil {
+			break
+		}
 
 		if w.Funcs[i].NextConditionFunc != nil {
 			startTime := time.Now()
