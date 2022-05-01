@@ -17,7 +17,7 @@ func (w Worker[T]) Do(inp T) (T, error) {
 	var err error
 	w.state = inp
 	for i := range w.Funcs {
-		w.state, err = w.Funcs[i].F(inp)
+		w.state, err = w.Funcs[i].F(w.state)
 		if err != nil {
 			return w.state, err
 		}
