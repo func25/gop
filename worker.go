@@ -35,3 +35,5 @@ func (w Worker[T]) Do(inp T) (T, error) {
 
 	return w.state, err
 }
+
+// functask: x2, x3, x4 speed
