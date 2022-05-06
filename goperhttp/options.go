@@ -7,7 +7,8 @@ import (
 
 type httpRequest struct {
 	*http.Request
-	timeout time.Duration
+	timeout       time.Duration
+	acceptedCodes map[int]bool
 }
 
 type RequestOption func(*httpRequest)
@@ -29,5 +30,14 @@ func OptAuthorization(token string) RequestOption {
 func OptTimeout(timeout time.Duration) RequestOption {
 	return func(q *httpRequest) {
 		q.timeout = timeout
+	}
+}
+
+func OptAcceptCode(statusCodes []int) RequestOption {
+	return func(q *httpRequest) {
+		q.acceptedCodes = make(map[int]bool, len(statusCodes))
+		for _, v := range statusCodes {
+			q.acceptedCodes[v] = true
+		}
 	}
 }

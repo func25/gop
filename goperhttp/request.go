@@ -3,6 +3,7 @@ package goperhttp
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 )
@@ -22,9 +23,11 @@ func RequestJSON[T any](method string, url string, body []byte, opts ...RequestO
 		return res, err
 	}
 
+	// apply custom
 	myReq := httpRequest{
-		Request: req,
-		timeout: 0,
+		Request:       req,
+		timeout:       0,
+		acceptedCodes: nil,
 	}
 	myReq.applyFrom(opts...)
 
@@ -44,12 +47,11 @@ func RequestJSON[T any](method string, url string, body []byte, opts ...RequestO
 	}
 
 	// get status code
-	res.StatusCode = resp.StatusCode
-	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusBadRequest {
-		return res, nil
+	if (len(myReq.acceptedCodes) != 0 && !myReq.acceptedCodes[res.StatusCode]) ||
+		res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusBadRequest {
+		return res, errors.New("[goper] wrong status code: ")
 	}
 
 	// get data
-	err = json.Unmarshal(res.Body, &res.Data)
-	return res, err
+	return res, json.Unmarshal(res.Body, &res.Data)
 }
