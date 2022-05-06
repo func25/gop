@@ -14,13 +14,16 @@ type GoperHttpRes[T any] struct {
 	Body       []byte
 }
 
-func RequestJSON[T any](method string, url string, body []byte, opts ...RequestOption) (GoperHttpRes[T], error) {
-	var res GoperHttpRes[T]
+func RequestJSON[T any](method string, url string, body interface{}, opts ...RequestOption) (res GoperHttpRes[T], err error) {
+	bodyBytes, err := json.Marshal(body)
+	if err != nil {
+		return
+	}
 
 	// config request
-	req, err := http.NewRequest(method, url, bytes.NewReader(body))
+	req, err := http.NewRequest(method, url, bytes.NewReader(bodyBytes))
 	if err != nil {
-		return res, err
+		return
 	}
 
 	// apply custom
@@ -37,13 +40,13 @@ func RequestJSON[T any](method string, url string, body []byte, opts ...RequestO
 	}
 	resp, err := client.Do(myReq.Request)
 	if err != nil {
-		return GoperHttpRes[T]{}, err
+		return
 	}
 
 	// get body
 	res.Body, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return res, err
+		return
 	}
 
 	// get status code
