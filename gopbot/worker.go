@@ -1,6 +1,8 @@
-package goper
+package gopbot
 
-import "time"
+import (
+	"time"
+)
 
 type Worker[T any] struct {
 	Funcs []FuncDef[T]

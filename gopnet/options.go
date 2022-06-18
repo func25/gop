@@ -1,4 +1,4 @@
-package goperhttp
+package gopnet
 
 import (
 	"net/http"
