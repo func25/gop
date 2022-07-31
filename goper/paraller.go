@@ -17,13 +17,13 @@ type paraller struct {
 	elapsed time.Duration
 
 	// error state, report
-	errors      []error
-	errChan     chan error
+	errors      []funcErr
+	errChan     chan *funcErr
 	stopWhenErr bool
 }
 
 func Paraller(batch int) *paraller {
-	return &paraller{batchNum: batch, errChan: make(chan error)}
+	return &paraller{batchNum: batch, errChan: make(chan *funcErr)}
 }
 
 func (p *paraller) AddWorks(funcs ...func() error) *paraller {
@@ -44,7 +44,7 @@ func (p *paraller) StopWhenError(stop bool) *paraller {
 	return p
 }
 
-func (p *paraller) Execute() []error {
+func (p *paraller) Execute() []funcErr {
 	p.startReport()
 	defer p.stopReport()
 
@@ -79,7 +79,7 @@ func (p *paraller) startReport() {
 				p.elapsed = time.Since(start)
 				return
 			}
-			p.errors = append(p.errors, err)
+			p.errors = append(p.errors, *err)
 		}
 	}
 }
@@ -93,7 +93,10 @@ func (p *paraller) executeFunc(i int) error {
 	defer p.w.Done()
 
 	if err := p.batches[i](); err != nil {
-		p.errChan <- err
+		p.errChan <- &funcErr{
+			Func: p.batches[i],
+			Err:  err,
+		}
 	}
 
 	return nil

@@ -1,7 +1,9 @@
-github.com/func25/mafu v1.0.3 h1:O2EXRurOdkOMq0MxR7297taOaUxub8MYzrhex9ImQCk=
-github.com/func25/mafu v1.0.3/go.mod h1:xbjXG5HbTTjVkDSYXY7KnnyqlTzRO8SroqiLWMJwHEY=
 github.com/func25/mafu v1.0.4 h1:knitUSltvFmfMfC8ap488vy+RPjZJkAnHXdrTgc3y8k=
 github.com/func25/mafu v1.0.4/go.mod h1:xbjXG5HbTTjVkDSYXY7KnnyqlTzRO8SroqiLWMJwHEY=
+github.com/func25/mathfunc v1.1.0 h1:GGfSIePbvozaH1oTET1KtrcqbfG0Qs2yCB6qgerUIys=
+github.com/func25/mathfunc v1.1.0/go.mod h1:VadYd75jsFrxopmeHqylPLZBD6A6n+l3A8z64dIGYA8=
+github.com/func25/slicesol v1.0.10 h1:cCXHy9/OnXJ4J23J6hmmtVM3sKgD7CgIEIS2FGFUZHw=
+github.com/func25/slicesol v1.0.10/go.mod h1:oy2dFLyvyrALv8rRMRFlbjuZlmhJ2VLzAM//3k5AiiM=
 github.com/google/go-cmp v0.5.2/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.5 h1:Khx7svrCpmxxtHBq5j2mp/xVjsi8hQMfNLvJFAlrGgU=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
