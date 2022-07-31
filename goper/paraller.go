@@ -8,27 +8,45 @@ import (
 )
 
 type paraller struct {
-	batches []func()
-
+	// batch state
+	batches  []func() error
 	w        sync.WaitGroup
-	elapsed  time.Duration
 	batchNum int
+
+	// execution report
+	elapsed time.Duration
+
+	// error state, report
+	errors      []error
+	errChan     chan error
+	stopWhenErr bool
 }
 
 func Paraller(batch int) *paraller {
-	return &paraller{batchNum: batch}
+	return &paraller{batchNum: batch, errChan: make(chan error)}
 }
 
-func (p *paraller) AddWorks(funcs ...func()) {
+func (p *paraller) AddWorks(funcs ...func() error) *paraller {
 	p.batches = append(p.batches, funcs...)
+
+	return p
 }
 
-func (p *paraller) ClearWork() {
-	p.batches = make([]func(), 0)
+func (p *paraller) ClearWork() *paraller {
+	p.batches = make([]func() error, 0)
+
+	return p
 }
 
-func (p *paraller) Execute() {
-	start := time.Now()
+func (p *paraller) StopWhenError(stop bool) *paraller {
+	p.stopWhenErr = stop
+
+	return p
+}
+
+func (p *paraller) Execute() []error {
+	p.startReport()
+	defer p.stopReport()
 
 	for i := 0; i < len(p.batches); {
 		des := len(p.batches)
@@ -41,15 +59,44 @@ func (p *paraller) Execute() {
 		}
 
 		p.w.Wait()
+
+		if p.stopWhenErr && len(p.errors) > 0 {
+			return p.errors
+		}
 	}
 
-	p.elapsed = time.Since(start)
+	return p.errors
 }
 
-func (p *paraller) executeFunc(i int) {
+func (p *paraller) startReport() {
+	start := time.Now()
+	p.errors = nil
+
+	for {
+		select {
+		case err := <-p.errChan:
+			if err == nil {
+				p.elapsed = time.Since(start)
+				return
+			}
+			p.errors = append(p.errors, err)
+		}
+	}
+}
+
+func (p *paraller) stopReport() {
+	p.errChan <- nil
+}
+
+func (p *paraller) executeFunc(i int) error {
 	p.w.Add(1)
 	defer p.w.Done()
-	p.batches[i]()
+
+	if err := p.batches[i](); err != nil {
+		p.errChan <- err
+	}
+
+	return nil
 }
 
 func (p *paraller) Report() time.Duration {
