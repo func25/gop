@@ -4,6 +4,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/func25/gop"
 	"github.com/func25/mafu"
 )
 
@@ -69,19 +70,21 @@ func (p *paraller) Execute() []funcErr {
 }
 
 func (p *paraller) startReport() {
-	start := time.Now()
-	p.errors = nil
+	go gop.SafeGo(func() {
+		start := time.Now()
+		p.errors = nil
 
-	for {
-		select {
-		case err := <-p.errChan:
-			if err == nil {
-				p.elapsed = time.Since(start)
-				return
+		for {
+			select {
+			case err := <-p.errChan:
+				if err == nil {
+					p.elapsed = time.Since(start)
+					return
+				}
+				p.errors = append(p.errors, *err)
 			}
-			p.errors = append(p.errors, *err)
 		}
-	}
+	})
 }
 
 func (p *paraller) stopReport() {
