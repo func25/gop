@@ -56,7 +56,7 @@ func (p *paraller) Execute() []funcErr {
 		}
 
 		for ; i < des; i++ {
-			go p.executeFunc(i)
+			p.executeFunc(i)
 		}
 
 		p.w.Wait()
@@ -91,8 +91,12 @@ func (p *paraller) stopReport() {
 	p.errChan <- nil
 }
 
-func (p *paraller) executeFunc(i int) error {
+func (p *paraller) executeFunc(i int) {
 	p.w.Add(1)
+	go p.doJob(i)
+}
+
+func (p *paraller) doJob(i int) error {
 	defer p.w.Done()
 
 	if err := p.batches[i](); err != nil {
