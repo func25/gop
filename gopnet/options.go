@@ -41,3 +41,9 @@ func OptAcceptCode(statusCodes []int) RequestOption {
 		}
 	}
 }
+
+func OptHeader(key string, value string) RequestOption {
+	return func(q *httpRequest) {
+		q.Header.Add(key, value)
+	}
+}

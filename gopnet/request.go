@@ -34,6 +34,11 @@ func Call[T any](method string, url string, body interface{}, opts ...RequestOpt
 		timeout:       0,
 		acceptedCodes: nil,
 	}
+
+	if body != nil {
+		opts = append([]RequestOption{OptHeader("Content-Type", "application/json;charset=utf-8")}, opts...)
+	}
+
 	myReq.applyFrom(opts...)
 
 	// send request
