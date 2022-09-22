@@ -18,9 +18,13 @@ type NetRes[T any] struct {
 }
 
 func Call[T any](method string, url string, body interface{}, opts ...RequestOption) (res NetRes[T], err error) {
-	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return
+	bodyBytes := []byte{}
+
+	if body != nil {
+		bodyBytes, err = json.Marshal(body)
+		if err != nil {
+			return
+		}
 	}
 
 	// config request
