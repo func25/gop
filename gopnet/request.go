@@ -11,9 +11,10 @@ import (
 )
 
 type NetRes[T any] struct {
-	Data T
-	Code int
-	Body []byte
+	Data   T
+	Code   int
+	Body   []byte
+	Header http.Header
 }
 
 func Call[T any](method string, url string, body interface{}, opts ...RequestOption) (res NetRes[T], err error) {
@@ -50,7 +51,8 @@ func Call[T any](method string, url string, body interface{}, opts ...RequestOpt
 		return
 	}
 
-	// get body
+	// get header + body
+	res.Header = resp.Header
 	res.Body, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return
