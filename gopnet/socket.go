@@ -9,7 +9,7 @@ import (
 )
 
 type stream struct {
-	*websocket.Conn
+	Conn *websocket.Conn
 
 	onError func(error) bool // continue?
 	onMsg   func([]byte)
