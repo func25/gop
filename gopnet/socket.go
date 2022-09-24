@@ -21,7 +21,7 @@ func Stream(url string, header http.Header) (*stream, error) {
 		return nil, err
 	}
 
-	s := stream{Conn: c, onError: onError, onMsg: func(b []byte) {}}
+	s := stream{Conn: c, onError: onError, onMsg: nil}
 
 	go func() {
 		interrupt := make(chan os.Signal, 1)
