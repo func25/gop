@@ -6,6 +6,7 @@ require (
 	github.com/func25/mafu v1.0.4
 	github.com/func25/slicesol v1.0.10
 	github.com/google/go-querystring v1.1.0
+	github.com/gorilla/websocket v1.5.0
 )
 
 require (
