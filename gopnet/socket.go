@@ -15,10 +15,10 @@ type stream struct {
 	onMsg   func([]byte)
 }
 
-func Stream(url string, header http.Header) (stream, error) {
+func Stream(url string, header http.Header) (*stream, error) {
 	c, _, err := websocket.DefaultDialer.Dial(url, header)
 	if err != nil {
-		return stream{}, err
+		return nil, err
 	}
 
 	s := stream{Conn: c, onError: onError, onMsg: func(b []byte) {}}
@@ -31,10 +31,10 @@ func Stream(url string, header http.Header) (stream, error) {
 		s.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 	}()
 
-	return s, nil
+	return &s, nil
 }
 
-func (s stream) OnMsg(f func([]byte)) {
+func (s *stream) OnMsg(f func([]byte)) *stream {
 	p := s.onMsg
 	s.onMsg = f
 
@@ -54,10 +54,14 @@ func (s stream) OnMsg(f func([]byte)) {
 			}
 		}()
 	}
+
+	return s
 }
 
-func (s *stream) OnError(f func(error) bool) {
+func (s *stream) OnError(f func(error) bool) *stream {
 	s.onError = f
+
+	return s
 }
 
 func onError(error) bool {
